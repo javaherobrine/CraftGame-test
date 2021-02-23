@@ -89,11 +89,14 @@ public class Client implements Closeable{
 			if(in instanceof ObjectInputStream) {
 				obj=(EventObject)in.readObject();
 			}else {
+				System.out.println("prepare to recv event");
 				Map m=(Map)in.readObject();
+				System.out.println("JSON received");
 				obj=new EventObject(Events.EVENTS_BEAN.list.get((int)m.get("eid")).newInstance());
 				if(obj.content instanceof OtherEvent) {
 					((OtherEvent)obj.content).content=((OtherEvent)obj.content).initContent((Map)m.get("content"));
 				}
+				System.out.println(obj);
 			}
 			obj.content.recvExec();
 			return obj;

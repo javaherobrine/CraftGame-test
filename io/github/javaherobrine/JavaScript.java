@@ -1,4 +1,4 @@
-package io.github.javaherobrine;
+   package io.github.javaherobrine;
 import javax.script.*;
 import java.util.*;
 import java.util.stream.*;
@@ -20,18 +20,7 @@ public class JavaScript {
 		if(object instanceof CharSequence) {
 			sb.append("\""+object.toString()+"\"");
 		}else if(object instanceof Object[]) {
-			sb.append("[\n");
-			Stream.of((Object[])object).forEach(o->{
-				if(o instanceof Object[]) {
-					sb.append(json(o));
-					sb.append(",");
-				}else {
-					sb.append(json(o));
-					sb.append(",");
-				}
-			});
-			sb.delete(sb.length()-2, sb.length()-1);
-			sb.append("\n]");
+			processArray((Object[])object,sb);
 		}else {
 			sb.append("{\n");
 			Stream.of(object.getClass().getFields()).filter(field->{
@@ -42,9 +31,7 @@ public class JavaScript {
 					Object thisFie=field.get(object);
 					if(thisFie!=null) {
 						if(thisFie instanceof Object[]) {	
-							Stream.of((Object[])thisFie).forEach(o->{
-								json(o);
-							});
+							processArray((Object[])thisFie,sb);
 						}else if(thisFie instanceof Number) {
 							sb.append(thisFie.toString()+",\n");
 						}else if(thisFie instanceof CharSequence) {
@@ -57,9 +44,17 @@ public class JavaScript {
 					}
 				} catch (IllegalArgumentException | IllegalAccessException e) {}
 			});
+			sb.delete(sb.length(),sb.length());
+			sb.append("}");
 		}
-		sb.delete(sb.length()-2,sb.length()-2);
-		sb.append("}");
 		return sb.toString();
+	}
+	private static void processArray(Object[] array,StringBuilder sb) {
+		sb.append("[\n");
+		Stream.of((Object[])array).forEach(o->{
+			sb.append(json(o));
+		});
+		sb.delete(sb.length()-2, sb.length()-1);
+		sb.append("\n]");
 	}
 }

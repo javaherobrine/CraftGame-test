@@ -5,7 +5,7 @@ public class TestEvent extends OtherEvent{
 	{
 		eid=Events.EVENTS_BEAN.nextEID();
 		Events.EVENTS_BEAN.reg(getClass(),eid);
-		content=new String[] {"²Ý"};
+		content=new String[] {"²Ý2333"};
 	}
 	@Override
 	public void sendExec(Client c) {
@@ -13,6 +13,7 @@ public class TestEvent extends OtherEvent{
 	}
 	@Override
 	public void recvExec() {
+		System.out.println("event received");
 		System.out.println("recv:"+((Object[])content)[0]);
 	}
 	@Override
