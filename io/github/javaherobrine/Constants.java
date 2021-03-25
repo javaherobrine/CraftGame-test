@@ -12,6 +12,7 @@ public final class Constants {
 	public static final int versionID=1851844483;
 	public static final String RENDERING_FEEDBACK_ADDR="lmqhlmx@163.com";
 	public static final String SORTING_FEEDBACK_ADDR="javaherobrine@qq.com";
+	public static final String ENCODING="UTF-8";
 	public static Field CLASSES=null;
 	static{
 		try {

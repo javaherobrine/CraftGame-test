@@ -76,8 +76,8 @@ public class Server implements Closeable {
 						c.in=new ObjectInputStream(c.is);
 						c.out=new ObjectOutputStream(c.os);
 					}else */if(c.msg.format==TransmissionFormat.JSON) {
-						c.in=new JSONInputStream(new InputStreamReader(c.is,"UTF-8"));
-						c.out=new JSONOutputStream(new OutputStreamWriter(c.os,"UTF-8"));
+						c.in=new JSONInputStream(c.is);
+						c.out=new JSONOutputStream(c.os);
 					}
 				}else {
 					c.os.write(IOUtils.intToByte4(-1));

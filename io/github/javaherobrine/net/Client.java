@@ -52,8 +52,8 @@ public class Client implements Closeable{
 						out=new ObjectOutputStream(os);
 						in=new ObjectInputStream(is);
 					}else */if(msg.format==TransmissionFormat.JSON){
-						out=new JSONOutputStream(new OutputStreamWriter(os,"UTF-8"));
-						in=new JSONInputStream(new InputStreamReader(is,"UTF-8"));
+						out=new JSONOutputStream(os);
+						in=new JSONInputStream(is);
 					}
 					return;
 				}else if(code==-1) {
@@ -83,7 +83,7 @@ public class Client implements Closeable{
 		bw.write(TransmissionFormat.RECONNECT.toString());
 		return c;
 	}
-	public EventObject recevieEvent() throws IOException {
+	public EventObject receiveEvent() throws IOException {
 		try {
 			EventObject obj=null;
 			if(in instanceof ObjectInputStream) {
@@ -91,7 +91,7 @@ public class Client implements Closeable{
 			}else {
 				System.out.println("prepare to recv event");
 				Map m=(Map)in.readObject();
-				System.out.println("JSON received");
+				System.out.println("JSON received:"+m==null);
 				obj=new EventObject(Events.EVENTS_BEAN.list.get((int)m.get("eid")).newInstance());
 				if(obj.content instanceof OtherEvent) {
 					((OtherEvent)obj.content).content=((OtherEvent)obj.content).initContent((Map)m.get("content"));

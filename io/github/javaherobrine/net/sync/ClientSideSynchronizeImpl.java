@@ -30,7 +30,7 @@ public class ClientSideSynchronizeImpl extends SynchronizeImpl implements Runnab
 		public void run() {
 			while(true) {
 				try {
-					c.recevieEvent();
+					c.receiveEvent();
 				} catch (IOException e) {
 					//TODO Connection reset or pipe broken and so on.You must do something to process this error
 					break;
@@ -50,7 +50,7 @@ public class ClientSideSynchronizeImpl extends SynchronizeImpl implements Runnab
 	public void run() {
 		while(true) {
 			try {
-				EventContent content=c.recevieEvent().content;
+				EventContent content=c.receiveEvent().content;
 				if(!(content instanceof DisconnectEvent)) {
 					content.recvExec();
 				}

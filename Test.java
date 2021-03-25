@@ -18,7 +18,9 @@ public class Test {
 		Client c=new Client(new Socket("localhost",8888),false);
 		c.shakeHands();
 		c.sendEvent(new EventObject(new TestEvent()));
+		/*
 		c.close();
 		s.close();
+		*/
 	}
 }

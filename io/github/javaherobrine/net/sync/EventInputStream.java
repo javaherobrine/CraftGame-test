@@ -5,7 +5,7 @@ import io.github.javaherobrine.net.event.Events;
 import java.util.*;
 import io.github.javaherobrine.ioStream.*;
 public class EventInputStream extends JSONInputStream implements EventInput{
-	public EventInputStream(Reader source) {
+	public EventInputStream(InputStream source) {
 		super(source);
 	}
 	@Override
