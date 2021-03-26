@@ -14,9 +14,9 @@ public class JavaScript {
 		} catch (ScriptException e) {}
 	}
 	public static String json(Object object) {
-		return json(object,new StringBuilder(),object.getClass());
+		return json(object,new StringBuilder());
 	}
-	public static String json(Object object,StringBuilder sb,Class clazz) {
+	public static String json(Object object,StringBuilder sb) {
 		if(object instanceof CharSequence) {
 			sb.append("\""+object.toString()+"\"");
 		}else if(object instanceof Object[]) {
@@ -37,7 +37,7 @@ public class JavaScript {
 						}else if(thisFie instanceof CharSequence) {
 							sb.append("\""+thisFie.toString()+",\"");
 						}else {
-							sb.append("\""+json(thisFie)+",\n");
+							sb.append(json(thisFie)+",\n");
 						}
 					}else {
 						sb.append("undefined,\n");
@@ -53,8 +53,9 @@ public class JavaScript {
 		sb.append("[\n");
 		Stream.of((Object[])array).forEach(o->{
 			sb.append(json(o));
+			sb.append(",");
 		});
-		sb.delete(sb.length()-2, sb.length()-1);
-		sb.append("\n]");
+		sb.delete(sb.length()-1, sb.length());
+		sb.append("\n],");
 	}
 }

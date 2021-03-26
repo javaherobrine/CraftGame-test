@@ -89,8 +89,4 @@ public class Server implements Closeable {
 	public ClientSideSynchronizeImpl.ServertSideSynchronizeImpl getImpl() throws IOException{
 		return new ClientSideSynchronizeImpl(accept(),true).new ServertSideSynchronizeImpl();
 	}
-	protected static void nullServer(Client sucess) {
-		thisServer=new Server();
-		thisServer.clients.add(sucess.msg.id, sucess);
-	}
 }
