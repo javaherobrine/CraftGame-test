@@ -1,9 +1,9 @@
 package io.github.javaherobrine.net;
 import java.io.*;
+import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 import java.net.*;
 import io.github.javaherobrine.net.event.*;
-import io.github.javaherobrine.net.event.EventObject;
 import io.github.javaherobrine.*;
 import io.github.javaherobrine.net.sync.*;
 import io.github.javaherobrine.ioStream.*;
@@ -16,7 +16,6 @@ public class Client implements Closeable{
 	boolean client;
 	Thread hook=new Thread(()->{
 		try {
-			if(client) sendEvent(new EventObject(DisconnectEvent.DISCONNECT));
 			soc.close();
 		} catch (IOException e) {}
 	}) ;
@@ -24,9 +23,8 @@ public class Client implements Closeable{
 		Runtime.getRuntime().addShutdownHook(hook);
 	}
 	public ShakeHandsMessage msg=new ShakeHandsMessage();
-	public Client(Socket soc,boolean client) throws IOException{
+	public Client(Socket soc) throws IOException{
 		this.soc=soc;
-		this.client=client;
 		this.is=soc.getInputStream();
 		this.os=soc.getOutputStream();
 	}
@@ -48,7 +46,7 @@ public class Client implements Closeable{
 					/*if(msg.format==TransmissionFormat.OBJECT) {
 						out=new ObjectOutputStream(os);
 						in=new ObjectInputStream(is);
-					}else */if(msg.format==TransmissionFormat.JSON){
+					}else*/ if(msg.format==TransmissionFormat.JSON){
 						out=new JSONOutputStream(os);
 						in=new JSONInputStream(is);
 					}
@@ -69,40 +67,38 @@ public class Client implements Closeable{
 	public void close() throws IOException {
 		soc.close();
 	}
-	public void sendEvent(EventObject event) throws IOException {
-		event.content.index=msg.id;
-		event.content.sendExec(this);
+	public void sendEvent(EventContent event) throws IOException {
+		event.index=msg.id;
+		event.sendExec();
 		out.writeObject(event);
 	}
 	public static Client reconnectToServer(String host,int port) throws IOException{
-		Client c=new Client(new Socket(host,port),true);
+		Client c=new Client(new Socket(host,port));
 		BufferedWriter bw=new BufferedWriter(new OutputStreamWriter(c.os,"UTF-8"));
 		bw.write(TransmissionFormat.RECONNECT.toString());
 		return c;
 	}
-	public EventObject receiveEvent() throws IOException {
+	public EventContent receiveEvent() throws IOException {
 		try {
-			EventObject obj=null;
+			EventContent obj=null;
 			if(in instanceof ObjectInputStream) {
-				obj=(EventObject)in.readObject();
+				obj=(EventContent)in.readObject();
+				obj.c=this;
 			}else {
-				System.out.println("prepare to recv event");
 				Map m=(Map)in.readObject();
-				System.out.println("JSON received:"+m==null);
-				obj=new EventObject(Events.EVENTS_BEAN.list.get((int)((Map)m.get("content")).get("eid")).newInstance());
-				if(obj.content instanceof OtherEvent) {
-					((OtherEvent)obj.content).content=((OtherEvent)obj.content).initContent((Map)((Map)m.get("content")).get("content"));
+				obj=Events.EVENTS_BEAN.list.get((int)((Map)m).get("eid")).getConstructor(Client.class).newInstance(this);
+				if(obj instanceof OtherEvent) {
+					((OtherEvent)obj).content=((OtherEvent)obj).initContent((Map)((Map)m.get("content")));
 				}
-				System.out.println(obj);
 			}
-			obj.content.recvExec();
+			obj.recvExec();
 			return obj;
-		} catch (ClassNotFoundException | InstantiationException | IllegalAccessException e) {
+		} catch (ClassNotFoundException | InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchMethodException | SecurityException e) {
 			return null;
 		}
 	}
-	public ClientSideSynchronizeImpl getImpl() {
-		return new ClientSideSynchronizeImpl(this, false);
+	public DefaultSynchronizeImpl getImpl() {
+		return new DefaultSynchronizeImpl(this);
 	}
 	@Override
 	public void finalize() throws IOException{

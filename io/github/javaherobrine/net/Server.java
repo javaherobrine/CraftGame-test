@@ -6,9 +6,7 @@ import java.util.*;
 import io.github.javaherobrine.ioStream.*;
 import io.github.javaherobrine.net.sync.*;
 public class Server implements Closeable {
-	private static final StringPrintStream STDOUT=new StringPrintStream(System.out,(str)-> {return "[Server]"+str;});
 	ServerSocket server;
-	public static Server thisServer;
 	Thread hook=new Thread(()->{
 		try {
 			server.close();
@@ -17,19 +15,17 @@ public class Server implements Closeable {
 	{
 		Runtime.getRuntime().addShutdownHook(hook);
 	}
-	public LinkedList<Client> clients=new LinkedList<>();
+	public LinkedList<ServerSideClient> clients=new LinkedList<>();
 	@Override
 	public void close() throws IOException {
 		Runtime.getRuntime().removeShutdownHook(hook);
 		server.close();
 	}
-	private Server() {}
 	public Server(ServerSocket i) {
 		this.server=i;
-		thisServer=this;
 	}
-	public Client accept() throws IOException{
-		Client c=new Client(server.accept(),false);
+	public synchronized ServerSideClient accept() throws IOException{
+		ServerSideClient c=new ServerSideClient(server.accept(),this);
 		BufferedReader br=new BufferedReader(new InputStreamReader(c.is,"UTF-8"));
 		boolean accepted=false;
 		while(!accepted) {
@@ -42,7 +38,7 @@ public class Server implements Closeable {
 			}
 			if(format==TransmissionFormat.RECONNECT) {
 				int id=Integer.parseInt(br.readLine());
-				Client oldClient=clients.remove(id);
+				ServerSideClient oldClient=clients.remove(id);
 				c.msg=oldClient.msg;
 				clients.add(id,c);
 			}
@@ -53,7 +49,6 @@ public class Server implements Closeable {
 				c.msg.status=TransmissionStatus.CONTINUE;
 				c.msg.id=-1;
 				c.close();
-				STDOUT.print("Client Transmission Format Not Support\r\n");
 				break;
 			}else {
 				c.os.write(IOUtils.intToByte4(0));
@@ -71,7 +66,6 @@ public class Server implements Closeable {
 					c.msg.id=clients.indexOf(c);
 					c.msg.mods=cmods;
 					accepted=true;
-					STDOUT.print("A client connected\r\n");
 					/*if(c.msg.format==TransmissionFormat.OBJECT) {
 						c.in=new ObjectInputStream(c.is);
 						c.out=new ObjectOutputStream(c.os);
@@ -86,7 +80,7 @@ public class Server implements Closeable {
 		}
 		return c;
 	}
-	public ClientSideSynchronizeImpl.ServertSideSynchronizeImpl getImpl() throws IOException{
-		return new ClientSideSynchronizeImpl(accept(),true).new ServertSideSynchronizeImpl();
+	public DefaultSynchronizeImpl getImpl() throws IOException{
+		return new DefaultSynchronizeImpl(accept());
 	}
 }

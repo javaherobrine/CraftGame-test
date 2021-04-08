@@ -1,5 +1,4 @@
 import io.github.javaherobrine.net.*;
-import io.github.javaherobrine.net.event.*;
 import io.github.javaherobrine.net.sync.*;
 import java.io.*;
 import java.net.*;
@@ -8,16 +7,15 @@ public class Test {
 		Server s=new Server(new ServerSocket(8888));
 		new Thread(()->{
 			try {
-				ClientSideSynchronizeImpl.ServertSideSynchronizeImpl ss=Server.thisServer.getImpl();
-				System.out.println(ss);
+				DefaultSynchronizeImpl ss=s.getImpl();
 				new Thread(ss).start();
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
 		}).start();
-		Client c=new Client(new Socket("localhost",8888),false);
+		Client c=new Client(new Socket("localhost",8888));
 		c.shakeHands();
-		c.sendEvent(new EventObject(new TestEvent()));
+		c.sendEvent(new TestEvent(c));
 		/*
 		c.close();
 		s.close();

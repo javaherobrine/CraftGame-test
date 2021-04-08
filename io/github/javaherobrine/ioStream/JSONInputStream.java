@@ -12,7 +12,6 @@ public class JSONInputStream implements ObjectInput{
 		try {
 			return JavaScript.parse(new String(source.readNBytes(IOUtils.byte4ToInt(source.readNBytes(4), 0)),"UTF-8"));
 		} catch (ScriptException e) {
-			System.out.println(e);
 			return null;
 		}
 	}

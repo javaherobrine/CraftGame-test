@@ -19,7 +19,6 @@ public class JSONOutputStream implements ObjectOutput{
 	public void writeUTF(String s) throws IOException {}
 	public void writeObject(Object obj) throws IOException {
 		byte[] data=JavaScript.json(obj).getBytes("UTF-8");
-		System.out.println(new String(data,"UTF-8"));
 		dest.write(IOUtils.intToByte4(data.length));
 		dest.write(data);
 	}
