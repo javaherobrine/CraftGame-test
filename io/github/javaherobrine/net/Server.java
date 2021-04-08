@@ -24,6 +24,16 @@ public class Server implements Closeable {
 	public Server(ServerSocket i) {
 		this.server=i;
 	}
+	public class ServerThread extends Thread{
+		@Override
+		public void run() {
+			while(true) {
+				try {
+					new Thread(Server.this.getImpl()).start();;
+				} catch (IOException e) {}
+			}
+		}
+	}
 	public synchronized ServerSideClient accept() throws IOException{
 		ServerSideClient c=new ServerSideClient(server.accept(),this);
 		BufferedReader br=new BufferedReader(new InputStreamReader(c.is,"UTF-8"));
