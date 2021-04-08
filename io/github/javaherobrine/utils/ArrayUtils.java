@@ -9,4 +9,18 @@ public final class ArrayUtils {
 		}
 		return objectss;
 	}
+	public static <T> T[] except(T[]arr,int start,int end) {
+		if(end<start) throw new IllegalArgumentException("end can't < start");
+		int sub=end-start+1;
+		int total=arr.length-sub;
+		T[] result=(T[])Array.newInstance(arr[0].getClass(), total);
+		for(int i=0;i<total;i++) {
+			if(i<start) {
+				result[i]=arr[i];
+			}else {
+				result[i]=arr[i+sub];
+			}
+		}
+		return result;
+	}
 }
