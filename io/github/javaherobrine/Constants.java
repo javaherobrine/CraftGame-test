@@ -1,9 +1,5 @@
 package io.github.javaherobrine;
-import java.util.*;
 import java.lang.reflect.*;
-import java.io.*;
-import io.github.javaherobrine.ioStream.*;
-import io.github.javaherobrine.net.*;
 public final class Constants {
 	private Constants() {}
 	public static final String CRLF=System.lineSeparator();
